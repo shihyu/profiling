@@ -189,14 +189,14 @@
 <pre><code class="language-go">func worker(id int, tasks &lt;-chan int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for task := range tasks {
-		....
+		// ...（省略昨天的 I/O 操作，詳見 7138-15.md）
 
 		// API 請求
 		if _, err := http.Get("https://ithelp.ithome.com.tw/articles/10349527"); err != nil {
 			log.Printf("Error http get: %v\n", err)
 		}
 
-		...
+		// ...（省略其他操作）
 	}
 }
 </code></pre>
@@ -324,7 +324,7 @@ func worker(ctx context.Context, id int, tasks &lt;-chan int, wg *sync.WaitGroup
 			}
 		})
 
-		...
+		// ...（刪除暫存檔，同 7138-15.md）
 
 		// API 請求
 		trace.WithRegion(taskCtx, "HTTPGet", func() {
@@ -344,7 +344,7 @@ func worker(ctx context.Context, id int, tasks &lt;-chan int, wg *sync.WaitGroup
 }
 
 func main() {
-	...
+	// ...（flag 解析、GOMAXPROCS、pprof、trace/CPU profile 設定，同 7138-15.md）
 
 	// 建立一個root span，用於追蹤所有 task
 	ctx := context.Background()
@@ -352,7 +352,7 @@ func main() {
 	defer mainTask.End()
 	start := time.Now()
 
-	...
+	// ...（建立 tasks channel 與 WaitGroup）
 
 	// 啟動多個 Worker
 	for i := 0; i &lt; *numWorkers; i++ {
@@ -360,7 +360,7 @@ func main() {
 		go worker(ctx, i, tasks, &amp;wg)
 	}
 
-	...
+	// ...（發送 tasks、close channel、wg.Wait()、印出耗時）
 }
 </code></pre>
 <p>看到這裡有沒有覺得用法很像 OpenTelemetry 與 OpenTracing 的 trace 與 span的用法呢？<br />

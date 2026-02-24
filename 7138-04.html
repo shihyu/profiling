@@ -280,6 +280,9 @@ BenchmarkTwoDimArrayGood-12           54          25308850 ns/op
 </ol>
 <p>濫用Thread或Coroutine會導致系統資源的浪費，因為CPU數量有限，過多的Thread或Coroutine會導致上下文切換開銷過高。合適地使用這些技術，並根據實際需求進行性能測試和優化，是提高系統性能的重要方法。</p>
 <p>這段程式會針對不同數量的Goroutine進行基準測試，從而瞭解系統在不同情況下的表現。</p>
+<blockquote>
+<p>以下程式碼存成 <code>main_test.go</code>，使用 <code>go test -bench=. -benchmem</code> 執行。</p>
+</blockquote>
 <pre><code class="language-go">package main
 
 import (
@@ -322,6 +325,27 @@ func (p *WorkerPool) Wait() {
 	p.wg.Wait()
 }
 
+// BenchmarkGoroutines 直接建立大量 Goroutine，作為對照組
+func BenchmarkGoroutines(b *testing.B) {
+	for _, n := range []int{10, 100, 1000, 10000} {
+		b.Run(fmt.Sprintf("%d-Goroutines", n), func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i &lt; b.N; i++ {
+				var wg sync.WaitGroup
+				for j := 0; j &lt; n; j++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						time.Sleep(time.Millisecond)
+					}()
+				}
+				wg.Wait()
+			}
+		})
+	}
+}
+
+// BenchmarkWorkerPool 使用 Goroutine 池，重用 Worker 減少建立開銷
 func BenchmarkWorkerPool(b *testing.B) {
 	for _, n := range []int{10, 100, 1000, 10000} {
 		b.Run(fmt.Sprintf("%d-WorkerPool", n), func(b *testing.B) {
@@ -416,6 +440,9 @@ ok  	demo/coroutine	5.742s
 <li><strong>優化記憶體使用</strong>：</li>
 </ol>
 <p>減少每個Goroutine需要的記憶體量，確保Goroutine的工作量和記憶體需求是合理的。</p>
+<blockquote>
+<p>以下程式碼存成 <code>main_test.go</code>，使用 <code>go test -bench=. -benchmem</code> 執行。</p>
+</blockquote>
 <pre><code class="language-go">package main
 
 import (
@@ -458,6 +485,27 @@ func (p *WorkerPool) Wait() {
 	p.wg.Wait()
 }
 
+// BenchmarkGoroutines 直接建立大量 Goroutine，作為對照組
+func BenchmarkGoroutines(b *testing.B) {
+	for _, n := range []int{10, 100, 1000, 10000} {
+		b.Run(fmt.Sprintf("%d-Goroutines", n), func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i &lt; b.N; i++ {
+				var wg sync.WaitGroup
+				for j := 0; j &lt; n; j++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						time.Sleep(time.Millisecond)
+					}()
+				}
+				wg.Wait()
+			}
+		})
+	}
+}
+
+// BenchmarkWorkerPool 使用 Goroutine 池，重用 Worker 減少建立開銷
 func BenchmarkWorkerPool(b *testing.B) {
 	for _, n := range []int{10, 100, 1000, 10000} {
 		b.Run(fmt.Sprintf("%d-WorkerPool", n), func(b *testing.B) {

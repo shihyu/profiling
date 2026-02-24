@@ -177,15 +177,6 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="應該是-profilling-吧"><a class="header" href="#應該是-profilling-吧">應該是 Profilling 吧？</a></h1>
-<p>本書整理自 iT 邦幫忙鐵人賽系列（7138），共 30 篇文章。</p>
-<ul>
-<li>原始系列頁：<a href="https://ithelp.ithome.com.tw/users/20104930/ironman/7138">https://ithelp.ithome.com.tw/users/20104930/ironman/7138</a></li>
-</ul>
-<h2 id="系列目錄"><a class="header" href="#系列目錄">系列目錄</a></h2>
-<ul>
-<li><a href="series-7138.html">系列介紹與章節清單</a></li>
-</ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="應該是-profilling-吧-1"><a class="header" href="#應該是-profilling-吧-1">應該是 Profilling 吧？</a></h1>
 <ul>
 <li>原始系列頁：<a href="https://ithelp.ithome.com.tw/users/20104930/ironman/7138">https://ithelp.ithome.com.tw/users/20104930/ironman/7138</a></li>
 <li>文章數：30</li>
@@ -688,6 +679,9 @@ BenchmarkTwoDimArrayGood-12           54          25308850 ns/op
 </ol>
 <p>濫用Thread或Coroutine會導致系統資源的浪費，因為CPU數量有限，過多的Thread或Coroutine會導致上下文切換開銷過高。合適地使用這些技術，並根據實際需求進行性能測試和優化，是提高系統性能的重要方法。</p>
 <p>這段程式會針對不同數量的Goroutine進行基準測試，從而瞭解系統在不同情況下的表現。</p>
+<blockquote>
+<p>以下程式碼存成 <code>main_test.go</code>，使用 <code>go test -bench=. -benchmem</code> 執行。</p>
+</blockquote>
 <pre><code class="language-go">package main
 
 import (
@@ -730,6 +724,27 @@ func (p *WorkerPool) Wait() {
 	p.wg.Wait()
 }
 
+// BenchmarkGoroutines 直接建立大量 Goroutine，作為對照組
+func BenchmarkGoroutines(b *testing.B) {
+	for _, n := range []int{10, 100, 1000, 10000} {
+		b.Run(fmt.Sprintf("%d-Goroutines", n), func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i &lt; b.N; i++ {
+				var wg sync.WaitGroup
+				for j := 0; j &lt; n; j++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						time.Sleep(time.Millisecond)
+					}()
+				}
+				wg.Wait()
+			}
+		})
+	}
+}
+
+// BenchmarkWorkerPool 使用 Goroutine 池，重用 Worker 減少建立開銷
 func BenchmarkWorkerPool(b *testing.B) {
 	for _, n := range []int{10, 100, 1000, 10000} {
 		b.Run(fmt.Sprintf("%d-WorkerPool", n), func(b *testing.B) {
@@ -824,6 +839,9 @@ ok  	demo/coroutine	5.742s
 <li><strong>優化記憶體使用</strong>：</li>
 </ol>
 <p>減少每個Goroutine需要的記憶體量，確保Goroutine的工作量和記憶體需求是合理的。</p>
+<blockquote>
+<p>以下程式碼存成 <code>main_test.go</code>，使用 <code>go test -bench=. -benchmem</code> 執行。</p>
+</blockquote>
 <pre><code class="language-go">package main
 
 import (
@@ -866,6 +884,27 @@ func (p *WorkerPool) Wait() {
 	p.wg.Wait()
 }
 
+// BenchmarkGoroutines 直接建立大量 Goroutine，作為對照組
+func BenchmarkGoroutines(b *testing.B) {
+	for _, n := range []int{10, 100, 1000, 10000} {
+		b.Run(fmt.Sprintf("%d-Goroutines", n), func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i &lt; b.N; i++ {
+				var wg sync.WaitGroup
+				for j := 0; j &lt; n; j++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						time.Sleep(time.Millisecond)
+					}()
+				}
+				wg.Wait()
+			}
+		})
+	}
+}
+
+// BenchmarkWorkerPool 使用 Goroutine 池，重用 Worker 減少建立開銷
 func BenchmarkWorkerPool(b *testing.B) {
 	for _, n := range []int{10, 100, 1000, 10000} {
 		b.Run(fmt.Sprintf("%d-WorkerPool", n), func(b *testing.B) {
@@ -2746,14 +2785,14 @@ ROUTINE ======================== main.worker in cs1/main.go
 <pre><code class="language-go">func worker(id int, tasks &lt;-chan int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for task := range tasks {
-		....
+		// ...（省略昨天的 I/O 操作，詳見 7138-15.md）
 
 		// API 請求
 		if _, err := http.Get("https://ithelp.ithome.com.tw/articles/10349527"); err != nil {
 			log.Printf("Error http get: %v\n", err)
 		}
 
-		...
+		// ...（省略其他操作）
 	}
 }
 </code></pre>
@@ -2881,7 +2920,7 @@ func worker(ctx context.Context, id int, tasks &lt;-chan int, wg *sync.WaitGroup
 			}
 		})
 
-		...
+		// ...（刪除暫存檔，同 7138-15.md）
 
 		// API 請求
 		trace.WithRegion(taskCtx, "HTTPGet", func() {
@@ -2901,7 +2940,7 @@ func worker(ctx context.Context, id int, tasks &lt;-chan int, wg *sync.WaitGroup
 }
 
 func main() {
-	...
+	// ...（flag 解析、GOMAXPROCS、pprof、trace/CPU profile 設定，同 7138-15.md）
 
 	// 建立一個root span，用於追蹤所有 task
 	ctx := context.Background()
@@ -2909,7 +2948,7 @@ func main() {
 	defer mainTask.End()
 	start := time.Now()
 
-	...
+	// ...（建立 tasks channel 與 WaitGroup）
 
 	// 啟動多個 Worker
 	for i := 0; i &lt; *numWorkers; i++ {
@@ -2917,7 +2956,7 @@ func main() {
 		go worker(ctx, i, tasks, &amp;wg)
 	}
 
-	...
+	// ...（發送 tasks、close channel、wg.Wait()、印出耗時）
 }
 </code></pre>
 <p>看到這裡有沒有覺得用法很像 OpenTelemetry 與 OpenTracing 的 trace 與 span的用法呢？<br />
