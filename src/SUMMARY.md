@@ -1,6 +1,5 @@
 # Summary
 
-- [封面](README.md)
 - [應該是 Profilling 吧？](series-7138.md)
   - [Day 01 D1 遙測信號在軟體系統中的協同應用](7138-01.md)
   - [Day 02 D2 簡介系統性能工程](7138-02.md)
