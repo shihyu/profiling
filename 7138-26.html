@@ -1,0 +1,353 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Day 26 D26 關聯 Profile 與 Trace - 應該是 Profilling 吧？</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">應該是 Profilling 吧？</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="d26-關聯-profile-與-trace"><a class="header" href="#d26-關聯-profile-與-trace">D26 關聯 Profile 與 Trace</a></h1>
+<ul>
+<li>系列：應該是 Profilling 吧？系列 第 26 篇</li>
+<li>Day：26</li>
+<li>發佈時間：2024-09-26 00:58:48</li>
+<li>原文：<a href="https://ithelp.ithome.com.tw/articles/10354731">https://ithelp.ithome.com.tw/articles/10354731</a></li>
+</ul>
+<h1 id="grafana-與-pyrscope-的合作"><a class="header" href="#grafana-與-pyrscope-的合作">Grafana 與 Pyrscope 的合作</a></h1>
+<p>Pyrscope 以前是一個開源的持續 Profiling 專案，<a href="https://grafana.com/blog/2023/03/15/pyroscope-grafana-phlare-join-for-oss-continuous-profiling/?pg=blog&amp;plcmt=body-txt">直到 2023 年被 Grafana 收購</a>，就成為 Grafana 生態圈中的一員。</p>
+<p>在這之前 Grafana 生態圈其實有自己的開源持續 Profiling 專案<code>Phlare</code>，於 2022 年推出。但在這時，2021年推出的 Pyrscope 更知名更多公司在用。收購後兩個專案合為一個<code>Grafana Pyrscope</code>。所以這裡以後提到 Pyrscope 都是指 Grafana Pyrscope。</p>
+<p>OpenTelemetry 已經有計畫將 Profile 作為第四種遙測訊號，所以 Grafana Lab 與其自己開發，不如收購整合已經成熟的 Pyrscope。這裡的成熟指的是針對各種程式語言與 profile 格式的整合程度，Pyrscope 顯然是超過 Phlare 的。</p>
+<p><img src="images/7138/d26-01.jpg" alt="https://ithelp.ithome.com.tw/upload/images/20240924/201049300IEKbKtrIx.jpg" /></p>
+<p>上圖的 Grafana Agent 也能想成是 OpenTelemetry Collector Sidecar 容器一樣的角色，負責收集某一個 k8s pod 中所有容器的 profile，在集中轉發至 Pyrscope 。這種用法，如果有使用過 OpenTelemetry 的讀者想必應該很熟悉。</p>
+<p>而左上角中的 Pyrscope SDK 其作用也與 OpenTelemetry SDK 一樣，負責設定與產生、傳送遙測訊號。</p>
+<p>以上與 OpenTelemetry 有關的內容，可以參加<a href="https://ganhua.wang/opentelemetry#heading-5pys5pu455uu6yye">OpenTelemetry 入門指南 Ch 5、6、7</a></p>
+<h2 id="迭代過程與-pyrscope"><a class="header" href="#迭代過程與-pyrscope">迭代過程與 Pyrscope</a></h2>
+<p><img src="images/7138/d26-02.svg" alt="" /></p>
+<ul>
+<li>
+<p>Step 1 : 收集分析數據<br />
+Grafana Pyrscope 從公開pprof端點的應用程式收集 CPU 和記憶體設定檔。</p>
+</li>
+<li>
+<p>Step 2︰運行 Pyrscope<br />
+透過將 Pyrscope 作為單一進程來啟動，只需幾分鐘即可開始。當您準備好從更多應用程式收集設定檔或想要高可用性設定時，只需添加更多主機資源並水平擴展即可。剩下的事情就由 Pyrscope 來處理。</p>
+</li>
+<li>
+<p>Step 3︰在 Grafana 中可視化<br />
+使用 Grafana 的 Pyrscope 資料來源，查詢 Pyrscope 中儲存的資料，並按相關時間範圍和 Label 進行切片和切區塊。 Grafana 的火焰圖、直方圖和表格視圖可讓您以不同的方式視覺化您的分析數據，並從中建立強大的儀表板。</p>
+</li>
+<li>
+<p>Step 4︰優化您的程式碼<br />
+Grafana Pyrscope 可協助您識別程式碼中最慢且最耗記憶體的部分，以便開發人員能夠深入並優化這些區域。這導致：</p>
+<ul>
+<li>更快的應用程式</li>
+<li>更可靠的應用程式和更少的 OOM 崩潰</li>
+<li>使用更少 CPU 和記憶體的經濟高效的應用程序</li>
+</ul>
+</li>
+</ul>
+<p>這樣的流程如同我們在<a href="https://ithelp.ithome.com.tw/articles/10353199">D19 讓系統數據看得見（可觀測性驅動開發 ODD）</a>與<a href="https://ithelp.ithome.com.tw/articles/10353428">D20 淺談回饋導向優化 PGO</a> 的結合，我們可以從頭到尾都在一個工具視窗中看見分析與比對，這是很舒服的一件事情。</p>
+<h2 id="將-profile-寫至-pyrscope"><a class="header" href="#將-profile-寫至-pyrscope">將 Profile 寫至 Pyrscope</a></h2>
+<p>首先我們需要安裝兩個套件<code>github.com/grafana/otel-profiling-go</code>與<code>github.com/grafana/pyroscope-go</code>。</p>
+<p><code>pyroscope-go</code>是Pyroscope Golang Client。主要功能是透過 pprof 負責檢測並產生各種 Profile 類型的資料，以及將 Profile 資料傳送至 Pyroscope 後端服務。</p>
+<p>而<code>otel-profiling-go</code>主要是提供由 OTel 的 trace 標準，將 trace 與 profiling 結合整合。</p>
+<pre><code class="language-go">import (
+	otelpyroscope "github.com/grafana/otel-profiling-go"
+	"github.com/grafana/pyroscope-go"
+)
+
+_, err = pyroscope.Start(pyroscope.Config{
+        // 被檢測的盈用程式名稱
+		ApplicationName: "ithome2024",
+        // Pyroscope 服務位置
+		ServerAddress:   "http://localhost:4040",
+		Logger:          pyroscope.StandardLogger,
+        // 用來方便查詢用的標籤
+		Tags: map[string]string{
+			"region":             "taiwan",
+			"hostname":           "nathan",
+			"service_git_ref":    "HEAD",
+			"service_repository": "https://github.com/grafana/pyroscope",
+			"service_root_path":  "examples/language-sdk-instrumentation/golang-push/rideshare",
+		},
+        // 指定要產生哪些類型的 profile
+		ProfileTypes: []pyroscope.ProfileType{
+			pyroscope.ProfileCPU,
+			pyroscope.ProfileInuseObjects,
+			pyroscope.ProfileAllocObjects,
+			pyroscope.ProfileInuseSpace,
+			pyroscope.ProfileAllocSpace,
+			pyroscope.ProfileGoroutines,
+		},
+	})
+	if err != nil {
+		log.Fatalf("error starting pyroscope profiler: %v", err)
+	}
+</code></pre>
+<blockquote>
+<p><a href="https://grafana.com/docs/pyroscope/latest/view-and-analyze-profile-data/profiling-types/#profiling-types">Available Pyroscope Profiling Types</a></p>
+</blockquote>
+<h2 id="整合-trace-與-profiling"><a class="header" href="#整合-trace-與-profiling">整合 Trace 與 Profiling</a></h2>
+<p><a href="https://ithelp.ithome.com.tw/articles/10353443">昨天我們提到 Profiling 的劣勢</a>，是</p>
+<blockquote>
+<p>缺少業務屬性：<br />
+因為關注點都在user/kernel space的執行路徑上,不知道現在這個採樣在哪個時機段為哪個業務行為服務, 除非在很單純的壓力測試場景中, 才好判斷。</p>
+</blockquote>
+<p>所以我們需要把它與業務屬性或方便與業務做關聯的 <code>trace</code> 兩者進行整合。<br />
+在我們設定配置完成 trace provider 時，將 trace provider 包裹進 otelpyroscope 的 trace provider 裡。為的是在 span.Start 時，能取得 <code>span id</code> 設置到 <code>pyroscope.profile.id</code>屬性上。<br />
+這與上面的 Tag 一樣也是用來查詢的，所以這樣 Trace 與 Profiling 之間就有了關聯。</p>
+<pre><code>    // 設定配置 otel trace sdk 的 trace provider
+	tracerProvider := sdktrace.NewTracerProvider(
+		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		sdktrace.WithResource(res),
+		sdktrace.WithSpanProcessor(bsp),
+	)
+    // wrap otel trace provder into otelpyroscope trace provider
+    // otelpyroscope.WithRootSpanOnly(false) 讓所有的 span 都會被設置 pyroscope.profile.id
+    otel.SetTracerProvider(otelpyroscope.NewTracerProvider(tracerProvider, otelpyroscope.WithRootSpanOnly(false)))
+</code></pre>
+<p>下圖點擊<code>Profiles to the span</code>按鈕，或是旁邊的迴紋針icon也能。就會跳轉去更完整的火焰圖。也能看見上面註明有<code>pyroscope.profile.id</code>，它的值就是該scope 的 root span id。</p>
+<p><img src="images/7138/d26-03.jpeg" alt="" /></p>
+<p>下圖左側是耗時的排行榜，右邊是火焰圖，而 Both 就是兩個都顯示。我們可以選擇要顯示哪個。</p>
+<p><img src="images/7138/d26-04.png" alt="" /></p>
+<p>點擊 Expand 之後能看見下圖更細節的火焰圖。<br />
+下圖能看見我程式有呼叫兩個不同名稱的 create garbage 函式，佔了總執行時間的多少百分比等資訊。<br />
+<img src="images/7138/d26-05.png" alt="" /></p>
+<blockquote>
+<p>原始程式碼的設計與場景等更深入的細節，未來在部落格或是書上再深入做說明。例如什麼是 span scope、trace provider等。</p>
+</blockquote>
+<h3 id="grafana-套件"><a class="header" href="#grafana-套件">Grafana 套件</a></h3>
+<p>因為這些都並不是原生就預載的功能，需要額外安裝<code>grafana-pyroscope-app</code>套件。<br />
+以及開啟該套件的功能<code>traceToProfiles</code>與<code>tracesEmbeddedFlameGraph</code>，我們才能完成 trace 關聯至 profile的動作。</p>
+<pre><code>- GF_INSTALL_PLUGINS=grafana-pyroscope-app
+- GF_FEATURE_TOGGLES_ENABLE=traceToProfiles tracesEmbeddedFlameGraph
+</code></pre>
+<h2 id="grafana-pyrscope-demo-site"><a class="header" href="#grafana-pyrscope-demo-site">Grafana Pyrscope Demo Site</a></h2>
+<p>這裡則是有 Grafana Pyrscope Demo Site 可以試玩。<br />
+<a href="https://play.grafana.org/explore?schemaVersion=1&amp;panes=%7B%225h2%22:%7B%22datasource%22:%22grafanacloud-demoinfra-profiles%22,%22queries%22:%5B%7B%22groupBy%22:%5B%5D,%22labelSelector%22:%22%7Bservice_name%3D%5C%22catalog%5C%22%7D%22,%22spanSelector%22:%5B%5D,%22queryType%22:%22both%22,%22refId%22:%22A%22,%22profileTypeId%22:%22process_cpu:cpu:nanoseconds:cpu:nanoseconds%22,%22datasource%22:%7B%22type%22:%22grafana-pyroscope-datasource%22,%22uid%22:%22grafanacloud-demoinfra-profiles%22%7D%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D%7D&amp;orgId=1">連結</a></p>
+<h2 id="本日小結"><a class="header" href="#本日小結">本日小結</a></h2>
+<p>Grafana Pyroscope 是一個強大的持續 profiling工具，它融合了 Grafana 的可觀測性平台與 Pyroscope 的持續剖析技術，為開發者提供更全面的性能監控解決方案。通過這個整合，Grafana Pyroscope 能夠在長時間內不間斷地收集應用程式的 CPU 和記憶體資料，並將這些資料可視化呈現，從而幫助開發團隊識別出系統瓶頸，優化應用效能。</p>
+<p>這個工具的核心在於它不僅能收集應用程式的性能數據，還能透過火焰圖等視覺化工具，讓開發者能夠直觀地看見問題所在。此外，Pyroscope 能夠與 OpenTelemetry 進行整合，將 trace 和 profile 進行關聯，讓開發者能更精準地分析每個 span 的性能數據，進一步提高調試效率。</p>
+<p>透過持續剖析，開發者可以不斷收集系統的長期數據，這讓他們能夠快速發現長期隱藏的效能瓶頸，並透過 Grafana 的視覺化工具及時進行修正，減少系統崩潰和效能下降的風險。最終，這樣的全方位觀測不僅有助於提升應用程式的效能和可靠性，還能讓企業節省計算資源與基礎設施成本，實現更具經濟效益的應用運維策略。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="7138-25.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="7138-27.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="7138-25.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="7138-27.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

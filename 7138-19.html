@@ -1,0 +1,420 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Day 19 D19 讓系統數據看得見（可觀測性驅動開發 ODD） - 應該是 Profilling 吧？</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">應該是 Profilling 吧？</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="d19-讓系統數據看得見可觀測性驅動開發-odd"><a class="header" href="#d19-讓系統數據看得見可觀測性驅動開發-odd">D19 讓系統數據看得見（可觀測性驅動開發 ODD）</a></h1>
+<ul>
+<li>系列：應該是 Profilling 吧？系列 第 19 篇</li>
+<li>Day：19</li>
+<li>發佈時間：2024-09-19 00:01:01</li>
+<li>原文：<a href="https://ithelp.ithome.com.tw/articles/10353199">https://ithelp.ithome.com.tw/articles/10353199</a></li>
+</ul>
+<p>在現今的軟體開發中，性能優化不再僅僅依賴開發者的直覺或經驗，而是通過數據的收集和分析來指導優化方向。在昨天的文章中，我們探討了如何通過 Go Trace 工具來分析 Goroutine 的行為，並通過減少 Goroutine 數量和使用 Object Pool 技術來有效提升系統的整體效能。今天，我們將探討另一個有力的工具——可觀測性驅動開發（ODD，Observability-Driven Development），並展示如何通過 Prometheus 和 Grafana 將數據可視化，幫助我們更好地分析決策和優化系統性能。</p>
+<p>在本文中，我將展示一個基於 Go 的 demo 程式，通過動態調整 worker 數量並將執行結果推送至 Prometheus Pushgateway，最終通過 Grafana 可視化這些數據。我們將看到，如何在開發過程中，通過收集和可視化性能數據，來做出更為理性且高效的優化決策。</p>
+<hr />
+<p>可觀測性驅動開發（ODD）強調在軟體開發過程中，通過持續收集應用的運行數據，來幫助開發者理解系統的內部行為並發現問題。這種方法的核心宗旨是：開發者應當在日常的開發和優化工作中，將系統的性能指標可視化，從而能夠通過數據來驅動改進。</p>
+<p>與傳統的性能分析工具不同，ODD 更加強調數據的持續性監控和可視化。例如，在優化工作中，我們不僅僅是分析執行時間或記憶體消耗的某一次性結果，而是持續地觀察系統在不同負載或併發情況下的行為變化。這使得 ODD 成為一個強有力的工具，幫助我們做出數據驅動的決策，而不僅依賴於經驗或假設。</p>
+<blockquote>
+<p>有了數據，有了儀表板，就不用在說<strong>我感覺</strong>。</p>
+</blockquote>
+<h2 id="實例演示"><a class="header" href="#實例演示">實例演示</a></h2>
+<p><strong>動態調整 worker 數量</strong></p>
+<p>這個示例程式的設計思想很簡單：每次倍增 worker 的數量，並測量每次執行的時間，然後將這些數據推送到 Prometheus Pushgateway。這些數據最終會在 Grafana 中顯示出來，讓我們一目了然地看到隨著 worker 數量的增加，系統的執行時間是如何變化的。</p>
+<pre><code class="language-go">package main
+
+import (
+	"context"
+	"flag"
+	"fmt"
+	"log"
+	"os"
+	"runtime"
+	"runtime/pprof"
+	"runtime/trace"
+	"sync"
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/push"
+)
+
+var (
+	// 定義 Prometheus 指標，使用 worker 作為 label
+	workerElapsed = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "worker_elapsed_time_seconds",
+			Help: "Elapsed time for workers to complete tasks, labeled by worker count",
+		},
+		[]string{"worker"},
+	)
+)
+
+func init() {
+	// 註冊 Prometheus 指標
+	prometheus.MustRegister(workerElapsed)
+}
+
+// 創建一個 Object Pool ，用於重用 []byte Object
+var bytePool = sync.Pool{
+	New: func() interface{} {
+		return make([]byte, 1024*1024*2) // 生成 2MB 的數據
+	},
+}
+
+// 模擬一個從 Message Queue 中接收任務並處理的 Worker
+func worker(ctx context.Context, id int, tasks &lt;-chan int, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for task := range tasks {
+		// 每個任務建立一個 sub task，方便追蹤
+		taskCtx, taskSpan := trace.NewTask(ctx, fmt.Sprintf("Worker-%d-Task-%d", id, task))
+		defer taskSpan.End()
+
+		// 從Object Pool中獲取一個 []byte Object，並在任務完成後 release it
+		data := bytePool.Get().([]byte)
+		defer bytePool.Put(data) // release it
+
+		// 模擬 I/O 操作 (寫入和讀取文件)
+		filename := fmt.Sprintf("/tmp/testfile_%d_%d", id, task)
+
+		// 模擬寫文件 I/O
+		trace.WithRegion(taskCtx, "WriteFile", func() {
+			err := os.WriteFile(filename, data, 0644)
+			if err != nil {
+				log.Printf("Error writing file: %v\n", err)
+			}
+		})
+
+		// 模擬讀文件 I/O
+		trace.WithRegion(taskCtx, "ReadFile", func() {
+			_, err := os.ReadFile(filename)
+			if err != nil {
+				log.Printf("Error reading file: %v\n", err)
+			}
+		})
+
+		// 刪除文件
+		os.Remove(filename)
+
+		// 模擬其他 CPU 任務
+		trace.WithRegion(taskCtx, "CPUTask", func() {
+			sum := 0
+			for i := 0; i &lt; 100000; i++ {
+				sum += i
+			}
+		})
+	}
+}
+
+func main() {
+	// 使用 flag 來設置 task 的數量
+	numTasks := flag.Int("tasks", 1000, "number of tasks to process")
+	procs := flag.Int("procs", 1, "number of go max procs")
+	flag.Parse()
+
+	// 設置最大 CPU 核心數，這裡可以嘗試不同的設定來觀察效果
+	runtime.GOMAXPROCS(*procs)
+
+	// 設置 Trace 和 CPU Profile
+	cpuFile, err := os.Create("cpu.prof")
+	if err != nil {
+		log.Fatalf("could not create CPU profile: %v", err)
+	}
+	defer cpuFile.Close()
+	if err := pprof.StartCPUProfile(cpuFile); err != nil {
+		log.Fatalf("could not start CPU profile: %v", err)
+	}
+	defer pprof.StopCPUProfile()
+
+	traceFile, err := os.Create("trace.out")
+	if err != nil {
+		log.Fatalf("could not create trace file: %v", err)
+	}
+	defer traceFile.Close()
+	if err := trace.Start(traceFile); err != nil {
+		log.Fatalf("could not start trace: %v", err)
+	}
+	defer trace.Stop()
+
+	// 動態增加 worker 數量，從 1 開始，每次倍增直到 1000
+	for workers := 1; workers &lt;= 1000; workers *= 2 {
+		// 建立一個root span，用於追蹤所有 task
+		ctx := context.Background()
+		ctx, mainTask := trace.NewTask(ctx, "MainTask")
+		defer mainTask.End()
+
+		start := time.Now()
+
+		// 創建一個 Channel 作為任務隊列
+		tasks := make(chan int, *numTasks)
+		var wg sync.WaitGroup
+
+		// 啟動多個 Worker
+		for i := 0; i &lt; workers; i++ {
+			wg.Add(1)
+			go worker(ctx, i, tasks, &amp;wg)
+		}
+
+		// 模擬向 Message Queue 中發送事件
+		for i := 0; i &lt; *numTasks; i++ {
+			tasks &lt;- i
+		}
+		close(tasks)
+
+		// 等待所有 Worker 完成
+		wg.Wait()
+
+		elapsed := time.Since(start)
+		fmt.Printf("Workers: %d, Elapsed Time: %s\n", workers, elapsed)
+
+		// 更新 Prometheus 指標，將 worker 數量作為 label 傳遞
+		workerElapsed.With(prometheus.Labels{"worker": fmt.Sprintf("%d", workers)}).Set(elapsed.Seconds())
+
+		pushMetrics()
+		// 每次測試結束後休眠 5 秒
+		time.Sleep(5 * time.Second)
+	}
+}
+
+func pushMetrics() {
+	if err := push.New("http://127.0.0.1:9091", "workers").
+		Collector(workerElapsed).
+		Push(); err != nil {
+
+		fmt.Println("Could not push completion time to Pushgateway:", err)
+	}
+}
+</code></pre>
+<p>每次 worker 執行完畢後，我們會將執行時間推送到 Prometheus Pushgateway。每個 worker 的數量作為 Prometheus 指標的標籤，執行時間則作為其值。這樣，我們能夠通過 Grafana 來看到隨著 worker 數量變化，執行時間是如何變化的。</p>
+<p><img src="images/7138/d19-01.jpg" alt="https://ithelp.ithome.com.tw/upload/images/20240917/20104930F22znhCMYv.jpg" /></p>
+<p>這樣的可視化數據給了我們一個清晰的方向，幫助我們迅速判斷在不同併發量下系統的瓶頸。通過這樣的持續監控，我們能夠動態調整 worker 數量，進行實時的性能優化。</p>
+<p>不過這裡我們只能看見總執行時間跟 Worker 數量，其實在前幾天我們已經證明了，在 worker 超過一個數量後，對總執行時間是沒太大影響的。有影響的是 CPU 的有效使用率。應用程式的細部行為與影響還是需要<code>Profiler</code>來協助。</p>
+<h2 id="小結"><a class="header" href="#小結">小結</a></h2>
+<p><strong>可觀測性驅動開發的應用場景</strong></p>
+<p>從這個案例中我們可以看出，可觀測性驅動開發不僅僅是一個技術實現，更是一種思維方式。它強調的是通過數據來驅動決策，通過持續的觀測來指導系統優化。這種方式適用於各種需要精確性能調整的場景，尤其是在高併發、高負載的分佈式系統中。</p>
+<p>總結來說，可觀測性驅動開發（ODD）為我們的開發流程帶來了極大的變革。它將傳統的開發流程進一步延伸到運行時數據的收集與分析，幫助我們進行精確的性能優化。通過可視化的數據，我們不再依賴經驗，而是讓數據說話，讓每次性能調整和優化決策都基於真實的運行結果。這樣的方式將在未來的軟體開發中扮演越來越重要的角色。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="7138-18.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="7138-20.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="7138-18.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="7138-20.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

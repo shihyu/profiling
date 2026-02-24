@@ -1,0 +1,317 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Day 18 D18 Go Tool Trace - 4 從 分析到實戰：最佳化 Goroutine 數量 - 應該是 Profilling 吧？</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">應該是 Profilling 吧？</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="d18-go-tool-trace---4-從-分析到實戰最佳化-goroutine-數量"><a class="header" href="#d18-go-tool-trace---4-從-分析到實戰最佳化-goroutine-數量">D18 Go Tool Trace - 4 從 分析到實戰：最佳化 Goroutine 數量</a></h1>
+<ul>
+<li>系列：應該是 Profilling 吧？系列 第 18 篇</li>
+<li>Day：18</li>
+<li>發佈時間：2024-09-18 00:00:36</li>
+<li>原文：<a href="https://ithelp.ithome.com.tw/articles/10352141">https://ithelp.ithome.com.tw/articles/10352141</a></li>
+</ul>
+<p>在昨天的文章中，我們深入探討了如何利用 Go Tool Trace 來分析程式的性能瓶頸，特別是 Goroutine 的調度與資源競爭問題。我們發現過多的 Goroutines 會導致 CPU 調度過度，從而增加排程等待時間，進一步降低系統的效率。通過數據分析與 Object Pool 技術的引入，我們逐步優化了系統性能，使得 Goroutines 的執行時間大幅縮短，同時降低了 GC 和系統調用的負擔。</p>
+<p>今天，我們將繼續這個主題，進一步探討如何找到適合的 Goroutines 數量，並運用公式來計算出最佳化後的並發度。通過對不同 Goroutines 數量的實際測試與數據分析，我們將展現如何在高併發環境下，最大化資源使用效率，並保持系統性能的穩定性。</p>
+<hr />
+<p>在高併發的環境中，找到適合的 worker 數量是一個關鍵的優化步驟。在上圖中，我們可以很容易地從總體比例圖中看到 Sched wait time（排程等待時間）和 Block time（系統調用阻塞時間）的差異。儘管系統需要進行寫入 I/O 並調用系統層面的 syscall，然而，在整個圖表中，幾乎看不到執行時間的明顯比例，這意味著大部分時間並非花在執行具體的任務上，而是浪費在等待 CPU 調度上。也就是說，儘管 CPU 佔用時間達到了 98.59%，但實際上，CPU 大部分時間都被浪費在無效的排程過程中，這顯示出 Goroutine 數量過多（1000 個）導致了過度的 CPU 調度壓力。</p>
+<p><img src="images/7138/d18-01.png" alt="" /></p>
+<p>從上面這個現象我們可以得知，當前的 1000 個 worker 數量顯然太多了。我們需要找到一個更合適的 worker 數量，以降低過度的調度開銷，提升實際執行的效率。然而，直接嘗試不同的 worker 數量進行調整並不現實，因此可以通過計算公式來幫助我們快速找到一個最佳的數量。</p>
+<blockquote>
+<p><code>Sched wait time</code> 我們已經知道是 Goroutines 在等待 CPU 調度將 CPU 指派給自己能執行時所花費的時間。雖然 CPU 佔用時間有 98.59%，但可以說幾乎在瞎忙。我們從這裡就能知道 Goroutine 1000 的數量太高了，至於要降低成多少呢？總不能每次都二分法吧（500、250、125這樣嘗試下去） 。</p>
+</blockquote>
+<p>目前，1000 個 worker 執行完成任務所需時間約為 1.46s。這是一個重要的基準。調整完的結果不能比這個基準還差。</p>
+<pre><code>go run main.go -workers 1000
+Workers: 1000, Elapsed Time: 1.468617815s
+</code></pre>
+<h2 id="調整-goroutine-數量的計算"><a class="header" href="#調整-goroutine-數量的計算">調整 Goroutine 數量的計算</a></h2>
+<p>為了找到最佳的 Goroutine 數量，可以使用以下的公式進行計算：<br />
+假設 <code>Total Time</code> 是整個 goroutine 的執行總時間，主要由以下幾部分構成：</p>
+<ul>
+<li><code>T_wait: sched wait time</code>（排程等待時間）</li>
+<li><code>T_exec: execution time</code>（執行時間）</li>
+<li><code>T_block: block time</code>（包括 sleep 和 syscall block time）</li>
+<li><code>T_syscall</code>: syscall execution time（系統調用執行時間）</li>
+</ul>
+<pre><code>Goroutine 數量 = ( T_wait + T_exec + T_block + T_syscall ) / T_wait
+</code></pre>
+<p>這個公式的目的是保持 <code>T_wait</code>（排程等待時間） 和 <code>T_exec</code>、<code>T_block</code>、<code>T_syscall</code>之間的比例平衡。如果 <code>T_wait</code>太高，則意味著 Goroutine 數量過多導致了過度的排程開銷。我們希望減少 Goroutine 數量，直到這些時間達到一個合理的比例。</p>
+<blockquote>
+<p>與 <a href="https://ithelp.ithome.com.tw/articles/10349235">D11 高併發系統設計中的實踐與挑戰</a> 的 <code>最佳 Thread 數量 = （（Thread 等待時間 + Thread CPU 時間）/ Thread CPU 時間）* CPU 數量</code><br />
+今天的公式更側重於調度、系統調用的影響，強調調度效率以及阻塞時間對於 CPU 資源的影響。目的是讓 CPU 更加高效地被利用，減少等待時間。</p>
+</blockquote>
+<p>可以按照上面的數據嘗試計算一下，以 Goroutine 885 為例。<code>(1.4s + 258us + 43ms+3ms + 300us) / (258us + 43ms+3ms + 300us) = 31</code>。</p>
+<p>改以 worker 31 個執行，能看到總時間一樣的。這說明我們其實不用這麼多的 Goroutine 也能以一樣的效率完成作業。</p>
+<pre><code>go run main.go -workers 31  
+Workers: 31, Elapsed Time: 1.435286063s
+</code></pre>
+<p>透過上述公式的計算，我們得出當 worker 數量減少到 31 個時，總體執行時間依然保持在 1.4 秒左右，與 1000 個 worker 時的總時間相當。然而，這時的 <code>Sched wait time</code> 顯著減少，這意味著 CPU 調度壓力已經得到了緩解，每個 worker 能夠更有效地使用 CPU 資源來完成工作。相比之下，1000 個 worker 的 Sched wait time 平均為 1.4 秒，而 31 個 worker 的 <code>Sched wait time</code> 則下降到約 400 毫秒，顯示出減少 Goroutine 數量的確有效地減輕了排程等待的負擔。</p>
+<p><img src="images/7138/d18-02.png" alt="" /></p>
+<blockquote>
+<p>調整過程中，要減少變數的數量。我們首先追求的是同樣的總執行時間下，怎麼有效增加 CPU 的執行時間。<br />
+而不會同時要追求總執行時間下降，又想要有效增加 CPU 的執行時間。</p>
+</blockquote>
+<h3 id="比較與分析"><a class="header" href="#比較與分析">比較與分析</a></h3>
+<p>在減少 worker 數量之後，系統調用阻塞時間和執行時間也發生了變化。首先，系統調用的阻塞時間並未隨著 Goroutine 數量的變化而大幅改變，這是因為 I/O 操作的本質決定了阻塞時間相對穩定。而執行時間則有所增加，這意味著隨著 worker 數量的減少，CPU 能夠將更多的時間分配給每個具體的任務，而不是花在排程上，這也進一步印證了減少 Goroutine 數量對於提升 CPU 使用效率的有效性。</p>
+<p>在這樣的基礎上，嘗試進一步增加 Goroutine 數量至 53 時，總體執行時間略微縮短到 1.2 秒，但 <code>sched wait time</code> 也有所上升。這表明，增加 Goroutine 數量會再次增加排程壓力，並未顯著改善吞吐量。由此可見，單純增加 Goroutine 數量並不是提升效能的最佳途徑，特別是在遇到系統調度瓶頸的情況下。</p>
+<h2 id="組合昨天的-object-pool"><a class="header" href="#組合昨天的-object-pool">組合昨天的 Object Pool</a></h2>
+<pre><code>go run main.go -workers 31
+Workers: 31, Elapsed Time: 582.977589ms
+</code></pre>
+<p>此時，能驚訝的發現，整個時間大幅縮短至 583 ms。<br />
+<img src="images/7138/d18-03.jpg" alt="https://ithelp.ithome.com.tw/upload/images/20240917/20104930EGyyVZZskB.jpg" /></p>
+<p>在將這裡的數據套用一次公式計算看看。<br />
+選擇一個 Goroutine（例如 Goroutine 11）來計算：</p>
+<ul>
+<li>Sched wait time (T_wait) = 452.268789ms</li>
+<li>Execution time (T_exec) = 7.794432ms</li>
+<li>Block time (T_block) = 0ms (chan receive) + 111.060866ms (syscall)</li>
+<li>Syscall execution time (T_syscall) = 12.728448ms</li>
+</ul>
+<p>(452.268789ms+7.794432ms+111.060866ms+12.728448ms)/452.268789ms<br />
+=(583.852535ms)/452.268789ms ≈ 1.29</p>
+<p>這意味著根據這個 Goroutine 的情況，我們目前的 Goroutine 數量可能已經接近最佳水平，減少 Goroutines 數量不會帶來太多額外的效率提升。在這個情況下，進一步優化可能是調整其他系統層面的資源配置或工作負載。</p>
+<p>但還是能將現在的 worker 數量 /1.29 ≈ 25試試看。</p>
+<pre><code>go run main.go -workers 25
+Workers: 25, Elapsed Time: 589.183927ms
+</code></pre>
+<p><img src="images/7138/d18-04.jpg" alt="https://ithelp.ithome.com.tw/upload/images/20240917/20104930uHAR0cniQG.jpg" /></p>
+<h3 id="微調後的分析"><a class="header" href="#微調後的分析">微調後的分析</a></h3>
+<p>從 31 個和 25 個 Goroutines 的執行結果對比來看，我們可以觀察到一些關鍵的差異。首先，在 31 個 Goroutines 的情境下，執行時間約為 583 毫秒，並且 CPU Sched Wait Time 大多數集中在 430 到 470 毫秒之間。這表示 Goroutines 雖然啟動了足夠多的執行緒來處理工作，但仍有大量時間浪費在等待 CPU 排程上，尤其是當系統遇到大量系統調用時。</p>
+<p>而在 25 個 Goroutines 的狀況下，總體執行時間略有延長，來到了 587 毫秒左右，但 CPU 調度的等待時間也有所減少，排程等待時間主要集中在 420 到 450 毫秒之間。這表明，減少 Goroutines 數量使得 CPU 在排程和資源分配上更加有效率，避免了過度的 Goroutines 爭奪資源導致的頻繁上下文切換。</p>
+<p>此外，兩者在 Block Time 上也有所差異。31 個 Goroutines 時，Block Time 在不同的 Goroutine 之間有較大的變化，從 95 毫秒到 130 毫秒不等。相對而言，25 個 Goroutines 的 Block Time 更加集中，大多數 Goroutines 的 Block Time 保持在 120 到 140 毫秒之間，顯示出系統調用更為穩定和一致。</p>
+<p>對比下來，減少 Goroutines 數量有助於縮短調度等待時間，並使系統調用的阻塞時間更加集中和穩定。這表明，隨著 Goroutines 數量的減少，系統資源可以更有效地分配，從而提升系統整體性能。與此同時，總執行時間雖然略有延長，但這並未對系統效率產生太大負面影響，反而能夠在高效調度資源的情況下，達到更穩定的性能表現。</p>
+<p>總結來說，31 個 Goroutines 提供了更高的並發處理能力，但代價是增加了排隊和調度的時間；而 25 個 Goroutines 則有效降低了調度開銷，使系統調用更加穩定，整體運行更加高效。因此，在實際應用中，應根據系統的具體負載來選擇合適的 Goroutines 數量，以便在並發處理能力和系統資源使用效率之間取得平衡。</p>
+<h2 id="小結"><a class="header" href="#小結">小結</a></h2>
+<p>今天的實驗進一步驗證了昨日分析的結論：過多的 Goroutines 不一定帶來更好的性能，反而會加重 CPU 的調度壓力。通過對不同 Goroutines 數量的測試，我們發現 31 個 Goroutines 已經達到了一個較佳的平衡點，既能保持高併發處理能力，又不會浪費系統資源。在這個數量下，系統的 Sched Wait Time 明顯降低，I/O 操作的阻塞時間保持穩定，整體運行效率得到了顯著提升。</p>
+<p>當我們嘗試進一步減少 Goroutines 數量至 25 個時，雖然排程等待時間有所下降，但總體執行時間略有增加，這表明減少 Goroutines 數量的邊際效益已經減少。因此，我們可以得出結論，在處理高併發任務時，選擇合適的 Goroutines 數量對於提升系統效能至關重要。而最佳的 Goroutines 數量並不是越多越好，而是應該根據系統負載進行調整，以達到最佳的資源利用效率。</p>
+<p>透過這次實驗與公式應用，我們能夠更科學地計算出合理的 Goroutines 數量，從而在未來的高併發場景中，為系統性能優化提供更明確的方向。</p>
+<blockquote>
+<p>CPU 使用率很高，真的不代表是有效的被利用在執行程式。需要我們花些時間與大量的知識來調整分析。<br />
+但重要的是要有穩定的 Baseline 作為比較的基準點。<br />
+CPU 使用率很低很低，那老闆才要哭泣。浪費錢租機器跟服務，每個月一樣要付那些費用的。就能考慮降機器規格節省成本。</p>
+</blockquote>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="7138-17.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="7138-19.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="7138-17.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="7138-19.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

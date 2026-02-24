@@ -1,0 +1,337 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Day 30 D30 結尾，推薦讀物 - 應該是 Profilling 吧？</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">應該是 Profilling 吧？</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="d30-結尾推薦讀物"><a class="header" href="#d30-結尾推薦讀物">D30 結尾，推薦讀物</a></h1>
+<ul>
+<li>系列：應該是 Profilling 吧？系列 第 30 篇</li>
+<li>Day：30</li>
+<li>發佈時間：2024-09-30 00:19:45</li>
+<li>原文：<a href="https://ithelp.ithome.com.tw/articles/10352882">https://ithelp.ithome.com.tw/articles/10352882</a></li>
+</ul>
+<p>最後一天來整理一下這一系列的內容。</p>
+<p><img src="images/7138/d30-01.png" alt="https://ithelp.ithome.com.tw/upload/images/20241008/201049300e47FBYiJM.png" /></p>
+<p><a href="https://ithelp.ithome.com.tw/articles/10347242">D1</a> 探討<code>遙測信號</code>與系統可觀測性之間的關聯。我們得知道各類型遙測信號負責的守備範圍，才好在設計階段，就把這些與系統結合，以滿足需求。遙測信號是系統具備可觀測性的基石，也是 OpenTelemtry 框架的重要價值。</p>
+<p><a href="https://devops.com/opentelemetry-isnt-the-hero-we-need-heres-why-its-failing-our-stack/">OpenTelemetry Isn’t the Hero We Need: Here’s Why it’s Failing our Stack</a><br />
+這篇文章的重點在於探討 OpenTelemetry 和 eBPF 兩者在可觀測性領域的不同定位與優劣，並指出 OpenTelemetry 雖然提供了一個標準化、跨系統的觀測性工具，但在實際應用上存在一些問題，特別是效率低下、功能過於廣泛且由於企業介入導致的「特性膨脹」。相對地，作者認為 eBPF 是一個更加高效、輕量的內核層次觀測工具，提供更深入且精確的系統可觀測性。<br />
+OpenTelemetry 適合提供大範圍的分佈式系統觀測，作為「大局觀」的工具；而 eBPF 適合深入系統內部進行精確診斷。合理的可觀測性方案應該將兩者結合使用，以達到全面的系統洞察。</p>
+<p>OpenTelemetry 的 <a href="https://opentelemetry.io/community/roadmap/#backlog">Roadmap 中確實也有 eBPF</a>。</p>
+<p>然後也有一些語言的 OpenTelemetry 自動檢測也是採用 eBPF。<a href="https://github.com/open-telemetry/opentelemetry-ebpf-profiler">opentelemetry-ebpf-profiler</a>、<a href="https://github.com/open-telemetry/opentelemetry-go-instrumentation">opentelemetry-go-instrumentation</a></p>
+<p>所以接下來我也打算往 eBPF 這方向去研究。</p>
+<p><a href="https://ithelp.ithome.com.tw/articles/10347376">D2~ D12</a> 則是探討<code>性能工程</code>，介紹基本定律、系統容量、外部指標。這也是系統測試工程中的一環。監控固然重要，但沒法左移，而這些都能嘗試左移，在釋出之前就能做出的驗證與評估。</p>
+<p><a href="https://ithelp.ithome.com.tw/articles/10349747">D13 ~ D18</a> 從<code>系統容量</code>的維度，CPU 是系統容量的一項資源。但大部分的後端應用場景，幾乎是以 I/O 密集任務為大宗。許多後端的普片常識是利用 <code>Async</code> 來處理，但 Async 就沒問題了？有這麼好用的銀彈？我們怎樣能看到 I/O 密集任務具體有多少在執行，消耗了什麼資源。可以怎麼估算。</p>
+<p><a href="https://ithelp.ithome.com.tw/articles/10353431">D21 ~ D23</a> 從<code>系統 GC</code>的角度，來嘗試檢測並可視化。能讓我們更了解 GC 對系統運行時的行為會有怎樣的影響。</p>
+<p><a href="https://ithelp.ithome.com.tw/articles/10356636">D24 ~ D27</a> 則是講 <code>Profiling</code> 常用到的部份，像是火焰圖，和 Profiling 服務 Grafana Pyroscope 怎麼蒐集這類型遙測訊號後提供分析與展示。</p>
+<p><a href="https://ithelp.ithome.com.tw/articles/10353199">D19、D20</a>、<a href="https://ithelp.ithome.com.tw/articles/10354132">D28、D29</a> 都是朝<code>可觀測性驅動開發</code>的目標去探討。一個角度是從寫好的程式看見問題後回饋並解決。令一個角度則是<code>左移</code>，在設計階段就能考慮近來。以及簡單分享<code>遺留系統</code>能怎麼稍加改善，使得遺留系統具有基礎的可觀測性能力。</p>
+<hr />
+<h1 id="推薦讀物"><a class="header" href="#推薦讀物">推薦讀物</a></h1>
+<h2 id="可觀測性工程"><a class="header" href="#可觀測性工程">可觀測性工程</a></h2>
+<p><img src="images/7138/d30-02.jpg" alt="https://ithelp.ithome.com.tw/upload/images/20240929/20104930FPVoAYMBPB.jpg" /></p>
+<p>這本書專注於如何透過現代可觀測性技術，提升軟體在營運環境中的可靠性、性能和可維護性。其主題圍繞可觀測性的概念，解釋如何透過蒐集和分析系統的 logs、metrics、traces 等資料，來診斷、排除和預防營運環境中的問題。</p>
+<p>主要內容包括：</p>
+<ul>
+<li>可觀測性的基礎理論：解釋什麼是可觀測性，與傳統監控的區別，並探討在現代分散式系統中的重要性。</li>
+<li>實際應用：涵蓋如何在營運系統中實現高效的可觀測性架構，並且融入到開發流程中，以提升團隊在處理異常情況時的反應能力。</li>
+<li>工具與技術：介紹如何運用如 OpenTelemetry、Prometheus、Jaeger 等觀測性工具來建立統一的可觀測平台，並以實際的技術實踐指導讀者。</li>
+<li>文化與流程：除了技術面向，書中還強調團隊文化與組織結構如何影響可觀測性成功實施的效果，並鼓勵跨團隊的協作與共享觀測資料。</li>
+<li>營運環境優化：討論如何利用觀測性數據進行系統調優，最終達到更穩定、更高效的營運運行狀態。<br />
+總體來說，這本書是為希望深入了解觀測性如何幫助實現軟體工程卓越的工程師、架構師和主管而寫的，特別針對那些管理複雜分散式系統、微服務架構的團隊。</li>
+</ul>
+<p>裡面也有推薦一些書</p>
+<ul>
+<li>《Implementing Service Level Objectives》,Alex Hidalgo 著(O’Reilly)</li>
+<li>《Distributed Tracing in Practice》,Austin Parker 等人所著(O’Reilly)</li>
+</ul>
+<h2 id="opentelemetry-學習手冊"><a class="header" href="#opentelemetry-學習手冊">OpenTelemetry 學習手冊</a></h2>
+<p><img src="images/7138/d30-03.jpg" alt="https://www.gotop.com.tw/Waweb2004/WawebImages/BookXL/A780.jpg" /></p>
+<p><a href="https://www.tenlong.com.tw/products/9786263249141?list_name=r-zh_tw">OpenTelemetry 學習手冊</a> 已上架</p>
+<p>該書的翻譯版本，在這篇文章的當下已經翻譯完成但還沒上架，十月多就會上架了，也是由小弟翻譯。<br />
+這本書針對開發者，尤其是有興趣導入 OpenTelemetry 的開發團隊。</p>
+<p>該系列的 D1 很多概念也是出自此書。對於可觀測性驅動開發、以及 OpenTelemetry 框架有興趣的讀者。這本書是必買的。作者 Ted 本身就是 OpenTelemetry 項目的創始人之一。由它的角度在講解 OpenTelemetry 一定是精準的。</p>
+<p>總的來說,這本書主要分為兩部分。在第 1 章至第 4 章中,會討論了監控和可觀測性的現狀,並向你展示了 OpenTelemetry 背後的動機。這些章節幫助你理解支撐整個項目的基礎概念。它們對於首次閱讀者來說不僅價值連城,對於已經實踐可觀測性一段時間的人也同樣寶貴。第 5 章至第 9 章則進入具體的使用案例和實施策略,以之前章節介紹的概念為主,討論其背後的運作原理,並提供指引,好讓你在各種應用和情景中實際實OpenTelemetry。</p>
+<p>如果你已經對可觀測性主題非常熟悉,可能會考慮直接跳到書的後半部分,這樣也不是不行,但審視初期章節總能再獲得一些收穫。無論如何,只要你帶著開放的心態閱讀這本書,你應該能從中獲益,並且一次又一次地回來翻閱。我們希望這本書成為你可觀測性旅程下一章的基石。</p>
+<p>裡面也有推薦一些書</p>
+<ul>
+<li>Betsy Beyer, Chris Jones, Jennifer Petoff 和 Niall Richard Murphy 編著, 網站可靠性<br />
+工程:Google 的系統管理之道(O’Reilly,2016)</li>
+<li>Daniel Gomez Blanco 著,Practical OpenTelemetry: Adopting Open Observability<br />
+Standards Across Your Organization(Apress,2023)</li>
+<li>Alex Boten 著,Cloud-Native Observability with OpenTelemetry: Learn to Gain Visibility into Systems by Combining Tracing, Metrics, and Logging with OpenTelemetry(Packt,2022)</li>
+<li>Sidney Dekker 著,The Field Guide to Understanding “Human Error”(Routledge,2014)</li>
+<li>Brendan Gregg 著,Systems Performance: Enterprise and the Cloud(Addison-Wesley,2020)</li>
+<li>Ronald McCollam 著,Getting Started with Grafana: Real-Time Dashboards for IT and<br />
+Business Operations(Apress,2022)</li>
+</ul>
+<h2 id="foundations-of-software-and-system-performance-engineering"><a class="header" href="#foundations-of-software-and-system-performance-engineering"><a href="https://learning.oreilly.com/library/view/foundations-of-software/9780133038149/">Foundations of Software and System Performance Engineering</a></a></h2>
+<p>這本書專注於軟體和系統性能工程的基礎，提供讀者關於性能優化的系統化方法，並涵蓋從需求定義到測試和擴展性等關鍵主題。其主要目標是幫助軟體工程師、架構師及測試工程師學習如何從設計開始就考慮性能，並在整個軟體開發生命週期中進行有效的性能管理。<br />
+特別的是還有教導如何使用性能建模技術來預測系統在不同負載下的行為，幫助識別性能瓶頸和潛在的擴展性問題。<br />
+探討不同的性能模型，包括排隊論、模擬模型等。</p>
+<h2 id="the-art-of-application-performance-testing"><a class="header" href="#the-art-of-application-performance-testing"><a href="https://learning.oreilly.com/library/view/the-art-of/9781491900536/">The Art of Application Performance Testing</a></a></h2>
+<p>這本書聚焦於應用程式性能測試的實踐與策略，幫助讀者學習如何針對應用程式進行有效的性能測試，並提供解決性能瓶頸的具體方法。書中主要強調如何規劃、設計和執行性能測試，以確保應用在各種負載條件下的穩定性和可擴展性。</p>
+<p>這本書適合剛接觸性能測試的初學者和有一定經驗的測試工程師，強調實際操作與理論結合。它為讀者提供了一個清晰的框架，讓他們能夠有效地測試應用程式性能，並提供持續優化的實踐指南。</p>
+<h2 id="effective-performance-engineering"><a class="header" href="#effective-performance-engineering"><a href="https://learning.oreilly.com/library/view/effective-performance-engineering/9781492030164/">Effective Performance Engineering</a></a></h2>
+<p>這本書專注於教導讀者如何在軟體開發過程中有效進行性能工程，從而提高系統的可靠性、穩定性和效率。書中的核心理念是將性能考量嵌入到整個開發週期，而不僅僅是留到最後的測試階段。它強調性能工程不僅僅是一組技術，而是涉及到開發流程、工具和文化的整體變革。</p>
+<p>也是有提到性能建模，以及解釋性能工程應該是整個 SDLC 的一部分，從需求分析、架構設計、開發到測試、部署和運維，每個階段都應考慮性能問題。強調性能工程不僅是解決性能瓶頸，還包括預防問題的發生。<br />
+一樣呼應了 <code>站在未來，規劃現在</code>的口號 :)</p>
+<p><img src="images/7138/d30-04.png" alt="" /></p>
+<h2 id="art-of-scalability-the-scalable-web-architecture-processes-and-organizations-for-the-modern-enterprise"><a class="header" href="#art-of-scalability-the-scalable-web-architecture-processes-and-organizations-for-the-modern-enterprise"><a href="https://learning.oreilly.com/library/view/art-of-scalability/9780134031408/">Art of Scalability, The: Scalable Web Architecture, Processes, and Organizations for the Modern Enterprise</a></a></h2>
+<p>這本書著重於現代企業如何設計可擴展的網路架構，並探討如何通過技術、流程和組織結構的協作，實現系統的高可擴展性。書中的主題不僅限於技術層面，還涵蓋企業在成長過程中所面臨的各種管理和運營挑戰，強調技術和組織結構必須同步發展以應對擴展需求。</p>
+<p>解釋可擴展性（Scalability）的基本概念，探討如何評估系統是否具備擴展能力，以及在軟體開發和架構設計中如何體現可擴展性的原則。強調擴展不僅是技術問題，也是業務和組織問題，需要跨部門的協作和規劃。</p>
+<p>提供多個真實世界的案例研究，展示不同規模的企業如何通過技術和組織策略來實現成功的擴展。<br />
+這些案例涵蓋了從初創公司到大企業的不同擴展需求，幫助讀者理解不同情況下的最佳實踐。<br />
+探討在可擴展性實踐中如何進行風險管理，確保系統在擴展過程中保持穩定性。</p>
+<p>蠻值得推薦的一本書</p>
+<h2 id="推薦演講影片"><a class="header" href="#推薦演講影片">推薦演講影片</a></h2>
+<p><a href="https://youtu.be/Lxt8Vqn4JiQ?si=zho2oXZ947Qe1aD5">Golang UK Conference 2017 | Filippo Valsorda - Fighting latency: the CPU profiler is not your ally</a><br />
+Filippo Valsorda 的演講<strong>Fighting Latency: The CPU Profiler Is Not Your Ally</strong>聚焦於解釋為什麼僅依賴 CPU profiler 來分析程式中的延遲問題是行不通的。他指出，Go 的 CPU profiler 雖然可以有效捕捉佔用 CPU 的程式運行過程，但卻無法反映出那些由 I/O 操作或網絡延遲引發的問題。Filippo 解釋了 CPU profiler 的工作原理，說明它只能記錄在 CPU 上執行的程式邏輯，對於程式等待 I/O 或外部響應的這些“空閒時間”，它是完全不可見的。</p>
+<p>接著，Filippo 強調了 CPU profiler 在改善吞吐量上的有效性，但如果目標是優化延遲，開發者應該考慮使用 Go 的 tracer 工具。透過 tracer 工具，開發者能夠捕捉所有阻塞的事件（如網路等待或檔案操作），這些事件雖然不消耗 CPU，但卻影響了系統的整體性能。他分享了一個具體的例子，展示如何通過分析阻塞事件來發現並解決瓶頸問題，最終優化延遲。</p>
+<p><a href="https://youtu.be/V74JnrGTwKA?si=sOFSApzmiCE__H8w">GopherCon 2017: Rhys Hiltner - An Introduction to "go tool trace"</a></p>
+<p>Rhys Hiltner 的演講**An Introduction to "go tool trace"**深入探討了 Go 的執行追蹤工具 "go tool trace" 的應用。他強調，Go 語言的並行性使得 goroutine 成為開發者常用的工具，但也因此引發了一些並行相關的問題。"go tool trace" 提供了一種方式，可以幫助開發者直觀地查看goroutine的排程狀況，理解goroutine是如何在多個操作系統 thread 之間切換的，以及它們的執行時間如何影響整體性能。</p>
+<p>Rhys 透過實際範例展示了 "go tool trace" 如何幫助解決延遲與競態條件等問題。例如，他分享了 Twitch 的一個營運環境問題，該問題涉及 RPC 系統中的同步邏輯錯誤。透過分析追蹤數據，他發現某些協程因為不正確的配額管理邏輯而陷入長時間的等待，這導致了服務的延遲。他還指出，這個工具不會取代其他分析工具，而是作為 CPU 或記憶體分析工具的補充，幫助開發者進一步理解系統中的延遲問題。</p>
+<p>此外，Rhys 還詳細解釋了 "go tool trace" 如何用來分析 Go 程式中的 GC 行為。他展示了如何通過該工具觀察垃圾回收期間goroutine數量的變化、CPU 的使用情況，以及為什麼某些服務在 GC 期間會出現性能下降的問題。他強調了 Go 在不同版本中對 GC 的改進，以及如何利用這些工具進行優化。</p>
+<p>總結來說，這兩篇演講雖然都關注 Go 中的性能問題，但著眼點有所不同。Filippo 著重於解釋為什麼單純依賴 CPU profiler 來優化延遲是行不通的，而 Rhys 則深入介紹了 "go tool trace" 如何幫助開發者可視化並理解協程的排程與系統延遲問題。兩位演講者都強調了 Go 語言中這些工具的重要性，並鼓勵開發者在遇到性能瓶頸時靈活應用這些工具來進行深入分析和優化。</p>
+<p><a href="https://youtu.be/cntWx7-MPUg?si=MYfz1b1iLzKF5PuM">#113 性能优化究竟应该怎么做？</a><br />
+內容也分成 CPU 使用場景以及 Mem 使用場景在分別說明，也值得一看。重點是中文的。</p>
+<h2 id="推薦-blog"><a class="header" href="#推薦-blog">推薦 Blog</a></h2>
+<p><a href="https://grafana.com/tags/">Grafana Blog Tags</a><br />
+這裡有 Grafana Blog 所有的 Tag :)</p>
+<p><a href="https://www.honeycomb.io/blog">Honeycomb Blog</a><br />
+可觀測性工程一書，就是由 Honeycomb 的眾人分享著作的。</p>
+<p><a href="https://www.elastic.co/blog">Elastic Blog</a></p>
+<p><a href="https://thenewstack.io/observability/">The News stack</a></p>
+<p><a href="https://opentelemetry.io/blog/2024/">OpenTelemetry Blog</a></p>
+<h2 id="推薦鐵人賽系列"><a class="header" href="#推薦鐵人賽系列">推薦鐵人賽系列</a></h2>
+<p><a href="https://ithelp.ithome.com.tw/users/20162175/ironman/7185">Grafana Zero to Hero</a><br />
+<a href="https://ithelp.ithome.com.tw/users/20162175/ironman/6445">時光之鏡：透視過去、現在與未來的 Observability</a><br />
+<a href="https://ithelp.ithome.com.tw/users/20149562/ironman/6674">你以為你在學 Grafana 其實你建立了 Kubernetes 可觀測性宇宙</a><br />
+<a href="https://ithelp.ithome.com.tw/users/20149562/ironman/7716">後 Grafana 時代的自我修養</a><br />
+<a href="https://ithelp.ithome.com.tw/users/20152073/ironman/7713">論前端工程師如何靠 Grafana 吃飯：從 Grafana App 到前端可觀測性</a><br />
+<a href="https://ithelp.ithome.com.tw/users/20162577/ironman/6448">Observability 101</a><br />
+<a href="https://ithelp.ithome.com.tw/users/20169490/ironman/7963">全端監控技術筆記---從Sentry到Opentelemetry</a></p>
+<hr />
+<blockquote>
+<p>小弟有興趣找有興趣落實可觀測性工程的團隊，也能去貴司進行分享內訓，歡迎聯繫。<br />
+<a href="https://www.linkedin.com/in/%E5%81%A5%E8%AA%A0-%E5%91%82-0631b4127/">小弟的Linkedin</a><br />
+<img src="images/7138/d30-05.jpg" alt="https://ithelp.ithome.com.tw/upload/images/20240929/20104930r8W8L1lYeY.jpg" /><br />
+小弟今年的著作，有興趣也能多支持 <a href="https://github.com/tedmax100/OpenTelemetryEntryBeook">OpenTelemetry 入門指南</a></p>
+</blockquote>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="7138-29.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="7138-29.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

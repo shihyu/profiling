@@ -1,0 +1,342 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Day 17 D17 淺談 Go Tool Trace - 3 實際分析 Goroutine Analysis - 應該是 Profilling 吧？</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">應該是 Profilling 吧？</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="d17-淺談-go-tool-trace---3-實際分析-goroutine-analysis"><a class="header" href="#d17-淺談-go-tool-trace---3-實際分析-goroutine-analysis">D17 淺談 Go Tool Trace - 3 實際分析 Goroutine Analysis</a></h1>
+<ul>
+<li>系列：應該是 Profilling 吧？系列 第 17 篇</li>
+<li>Day：17</li>
+<li>發佈時間：2024-09-17 00:06:30</li>
+<li>原文：<a href="https://ithelp.ithome.com.tw/articles/10352139">https://ithelp.ithome.com.tw/articles/10352139</a></li>
+</ul>
+<p>昨天我們簡單理解了有關 runtime/trace 的 User-defined tasks 和 User-defined regions。</p>
+<p>今天，我們將進一步探討如何運用 Go 語言生態中的性能分析工具——Go Trace，並結合自訂的分析功能來進行深入的性能調查。展示如何幫助我們理解程式的執行行為與資源分配情況。透過這樣的性能分析工具，我們不僅可以找出程式中的潛在效能瓶頸，以及它們如何影響整體性能。這些方法將為我們在高併發環境中處理效能問題提供強大的技術支持。</p>
+<h1 id="實際分析-goroutine-analysis"><a class="header" href="#實際分析-goroutine-analysis">實際分析 Goroutine Analysis</a></h1>
+<p>會先看到如下圖，這裡能告訴我們整個應用程式中，有多少 Goroutine，又是在什麼 package 裡面建立並運行這些 goroutine，以及總共執行時間。</p>
+<p>讓我們一起分析以下的圖。<br />
+<img src="images/7138/d17-01.png" alt="" /></p>
+<h2 id="主要-goroutine-分佈"><a class="header" href="#主要-goroutine-分佈">主要 Goroutine 分佈</a></h2>
+<p>從上圖來看，我們可以清楚地看到 Goroutines 的分佈情況，這對於分析程式效能瓶頸至關重要。從圖表中，首先能夠觀察到各個 Goroutine 的啟動位置、數量以及它們所花費的總執行時間。</p>
+<div class="table-wrapper"><table><thead><tr><th>Start Location</th><th>Count</th><th>Total Execution Time</th></tr></thead><tbody>
+<tr><td>main.excessiveWorker</td><td>1000</td><td>1.598845619s</td></tr>
+<tr><td>runtime.gcBgMarkWorker</td><td>1</td><td>401.358648ms</td></tr>
+<tr><td>runtime.bgscavenge</td><td>1</td><td>154.031374ms</td></tr>
+<tr><td>runtime.bgsweep</td><td>1</td><td>11.882451ms</td></tr>
+<tr><td>其他 Goroutine</td><td>其餘單次執行都較短</td><td></td></tr>
+</tbody></table>
+</div>
+<p>最顯著的一點是 <code>main.excessiveWorker</code> 這個 Goroutine 群組，它創建了 1000 個 Goroutines，並且總共花費了約 1.6 秒的執行時間。這個數據表明，這個 Goroutine 群組是程式的主要運算負載，消耗了大量的 CPU 資源。這樣的情況下，我們可以推測 <code>excessiveWorker</code> 這個 Goroutine 群組可能是在處理某個密集的任務，但由於創建了過多的 Goroutines，導致了 <strong>CPU 的競爭過度</strong>。當 Goroutines 被頻繁地創建和調度時，會導致大量的 context switching 開銷，而這些開銷會影響整體的系統性能。</p>
+<p>除了 <code>main.excessiveWorker</code> 這個主要的 Goroutine 群組，我們還可以看到一些與 GC 相關的 Goroutines，例如 <code>gcBgMarkWorker</code>、<code>bgscavenge</code> 和 <code>bgsweep</code>。其中，<code>gcBgMarkWorker</code> 這個 Goroutine 花費了約 401 毫秒，這是一個相對高的垃圾回收工作時間。過多的 GC 工作通常表明程式中存在大量的記憶體分配和釋放操作，這些操作會加重 GC 的負擔，特別是在高併發的場景中，這可能進一步拖累系統的性能。不過，<code>bgsweep</code> 和 <code>bgscavenge</code> 的運行時間分別為 11 毫秒和 154 毫秒，相對較低，這表明在這段時間內，GC 的壓力並不大。</p>
+<p>對於其他 Goroutines，如 <code>main.main</code> 或 <code>internal/singleflight.(*Group).doCall</code>，它們的執行時間相對較短，且每個只有一個 Goroutine，這些小範圍執行的 Goroutines 並未對整體性能造成顯著影響。這些 Goroutines 可能是一些初始化或輔助性的操作，它們不會對程式的效能瓶頸構成威脅。</p>
+<p>所以這一頁就已經能給我分一些優化改善方向。</p>
+<h3 id="找出關鍵對象-zoom-in"><a class="header" href="#找出關鍵對象-zoom-in">找出關鍵對象 Zoom in</a></h3>
+<p>進一步分析，我們可以將目光集中在 <code>main.excessiveWorker</code> 上，因為這個 Goroutine 群組佔據了大部分的計算資源。該群組創建了過多的 Goroutines，而每個 Goroutine 的執行時間相對較長。這可能是由於設計不佳的並發模式，導致了 Goroutine 爆炸（Goroutine Leak）或無限迴圈等問題。過多的 Goroutines 不僅會增加 context switching 的次數，還會讓 CPU 資源變得稀缺，進一步降低整體系統性能。</p>
+<p>同時，GC 的負擔也是一個需要考量的問題。<code>gcBgMarkWorker</code> 花費了將近 400 毫秒的時間來執行垃圾回收操作，這表明記憶體分配和釋放頻率較高。這通常與大量 Goroutines 的創建和銷毀有關。當程式中頻繁進行記憶體分配和釋放時，GC 必須頻繁介入來管理記憶體，進而加重系統的負擔。</p>
+<p>根據這些觀察，我們可以提出一些優化建議。首先，應該減少 main.excessiveWorker 中 Goroutines 的數量，避免過多的併發操作。這可以通過引入 Goroutine pool 來實現，限制同時運行的 Goroutines 數量，減少上下文切換的開銷。同時，可以優化記憶體管理，避免頻繁的記憶體分配和釋放，從而減輕 GC 的壓力。</p>
+<p>總的來說，main.excessiveWorker 是目前程式性能的主要瓶頸。我們應該集中精力優化這個部分，並減少其對 CPU 資源和 GC 的過度消耗。這將有效提升程式的整體效能，並減少系統的運行壓力。</p>
+<p>這些措施應能有效地減少系統負擔，並提高程式的併發性能。但我能根據 <a href="https://ithelp.ithome.com.tw/articles/10348115">D6 介紹的 80/20 定律</a>（80% 的性能瓶頸來自於 20% 的系統資源或程式碼區段）。選擇 <code>main.excessiveWorker</code> 來查看分析。就會看見如下圖所示的內容。</p>
+<h3 id="分析-goroutine"><a class="header" href="#分析-goroutine">分析 Goroutine</a></h3>
+<p><img src="images/7138/d17-02.png" alt="" /></p>
+<p>在進行 Goroutine 分析時，從圖表中可以清楚地看到整個應用程式中的 Goroutine 活動分佈。這頁主要分為三個部分：Summary、Breakdown 和 Special Ranges，分別提供了 Goroutines 的概覽數據、詳細數據以及系統特殊事件的影響分析。</p>
+<p><strong>Summary 部分</strong><br />
+Summary 部分提供了一個高層次的概覽，展示了某個 Goroutine 群組在應用程式中的整體重要性及其性能影響。首先，Summary 會顯示 Goroutines 的啟動位置，這使開發者可以快速定位這些 Goroutines 所屬的程式碼源頭。接著，會提供每個群組的 Goroutine 數量，像是在這個例子中，main.excessiveWorker 創建了 1000 個 Goroutines，這反映了程式中併發操作的數量。更重要的是，Summary 也展示了每個 Goroutine 群組的總執行時間，例如，<code>main.excessiveWorker</code> 佔用了整體系統執行時間的 73.28%，這是一個明顯的性能瓶頸指標。透過這個數據，開發者可以快速確定應該優先關注的 Goroutine 群組，進一步調查其性能問題。</p>
+<p>Summary 還會提供一些圖表連結，如網路延遲、同步阻塞、系統調用阻塞以及調度延遲等性能瓶頸分析工具，這些圖表能幫助深入了解系統中的瓶頸原因。</p>
+<p><strong>Breakdown 部分</strong><br />
+Breakdown 部分進一步提供了每個 Goroutine 更詳細的數據分析。這裡展示了每個 Goroutine 的執行時間分佈，以及它們在不同操作中的阻塞情況。首先是每個 Goroutine 的執行時間，這讓我們可以了解每個 Goroutine 完成其任務的時間長短。接下來展示的是阻塞時間，包括等待 GC、等待 Channel 資料或系統調用的阻塞時間。這對於理解 Goroutines 在等待資源或系統響應時的行為很有幫助。</p>
+<p>Breakdown 還包括了調度等待時間，這揭示了 Goroutines 被 CPU 調度到運行之前的等待時間。如果 CPU 資源過於緊張，這段時間可能會很長，這也是性能瓶頸的常見來源之一。最後，系統調用的執行時間會顯示每個 Goroutine 在系統層面進行 I/O 或其他操作時的耗時。如果這部分的數據很高，說明系統層面可能存在 I/O 瓶頸。這些詳細的數據可以幫助開發者找到具體的性能瓶頸所在，例如系統呼叫過多或 CPU 調度延遲，從而對應進行調整和優化。</p>
+<p>值得注意的是，還有一個名為 <code>Unknown Time</code> 的欄位，這用來表示無法追蹤的執行時間。如果該欄位的數值非零，則可能表明系統中存在一些未捕捉到的性能問題。</p>
+<p><strong>Special Ranges 部分</strong><br />
+<img src="images/7138/d17-03.png" alt="" /></p>
+<p>Special Ranges 部分主要針對特殊的系統事件和 GC 過程，特別是應用程式中 stop-the-world 的 GC 階段。這部分幫助開發者了解 GC 對應用的具體影響，尤其是在 GC 的標記和掃描階段。當 GC 進行時，程式可能會暫時停頓，以便回收不再使用的記憶體存，這會直接影響應用的延遲和響應性。</p>
+<p>其中，<code>GC incremental sweep</code> 顯示了 Goroutine 在 GC 增量掃描階段的耗時。大部分 Goroutines 在這個階段的耗時非常短，通常在 us 級別，這表明增量掃描對系統的影響不大。增量掃描的設計就是為了減少垃圾回收對程式執行的影響，數據也顯示這部分運行正常。</p>
+<p>另外，<code>GC mark assist</code> 反映了一些 Goroutines 在標記輔助過程中的耗時。某些 Goroutines 會幫助垃圾回收器標記存活對象，這會增加它們的執行時間。尤其是在高併發場景下，這些 Goroutines 可能因頻繁的記憶體分配而需要頻繁標記，從而影響性能。</p>
+<p>最後，<code>Stop-the-world</code> (GC mark termination) 和 <code>Stop-the-world</code> (GC sweep termination) 顯示了程式在 GC 的標記和清理終止階段的暫停時間。從數據來看，大部分 Goroutines 的停頓時間都非常短，通常為 ms 或 us 級別，這表明垃圾回收對整體系統的影響有限。</p>
+<p><strong>問題分析與優化建議</strong><br />
+從 Breakdown 部分來看，首先需要關注的是 Goroutines 在系統調用上阻塞的時間。系統調用（例如文件操作或網絡請求）如果遇到瓶頸，會導致大量的 Goroutines 堆積等待資源釋放，這會顯著影響應用的整體性能。解決這個問題的一個方法是引入 Async I/O 或批量操作，從而減少每次系統調用的頻率，提升效率。</p>
+<p>另外，從調度等待時間來看，Goroutines 等待 CPU 的時間相對較長，這表明 CPU 資源不足或併發過度。當 Goroutines 的數量過多時，即使 CPU 利用率不高，調度器也無法及時處理所有的 Goroutines，導致這些 Goroutines 處於等待狀態。解決這個問題的一個方法是引入 Goroutine 池，限制同時啟動的 Goroutines 數量，減少 CPU 的調度壓力。</p>
+<p>Special Ranges 部分的數據分析則顯示，GC 機制的增量掃描對系統的影響不大，GC 標記輔助部分可能會導致少量 Goroutines 的負擔加重。為了減少 GC 的影響，可以考慮優化記憶體分配，降低頻繁分配和釋放記憶體的次數。這可以通過使用 Pool 或對象重用技術來實現，從而減少 GC 的負擔。</p>
+<p>總結來看，通過這些數據分析，我們可以識別出應用程式中的性能瓶頸，並提出具體的優化方案。減少系統調用的阻塞、優化 CPU 資源分配、優化記憶體管理，都是提高應用程式效能的有效措施。透過持續監控和調整這些指標，可以確保系統在高併發環境下仍能保持穩定高效的運行。</p>
+<h2 id="以-object-pool-pattern-改寫優化"><a class="header" href="#以-object-pool-pattern-改寫優化">以 Object Pool Pattern 改寫優化</a></h2>
+<blockquote>
+<p><a href="https://en.wikipedia.org/wiki/Object_pool_pattern">Object Pool Pattern</a>是一種重複利用已建立對象的設計模式。透過建立一個 object pool ，當需要新 object時，從 pool 中獲取可用 object，使用後再放回 pool 中。這樣避免了反覆的建立和銷毀對象。<br />
+目的： 減少重複建立、銷毀大量短生命週期的object，降低記憶體分配頻率，從而提升系統效能。<br />
+改善的痛點： 頻繁的記憶體分配與釋放會導致 GC 壓力增大，增加 CPU 的上下文切換次數，降低系統整體性能，特別是在高併發的場景下。</p>
+</blockquote>
+<pre><code class="language-go">// 創建一個 Object Pool ，用於重用 []byte Object
+var bytePool = sync.Pool{
+	New: func() interface{} {
+		return make([]byte, 1024*1024*2) // 生成 2MB 的數據
+	},
+}
+
+// 模擬一個從 Message Queue 中接收任務並處理的 Worker
+func worker(ctx context.Context, id int, tasks &lt;-chan int, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for task := range tasks {
+		...
+
+		// 從Object Pool中獲取一個 []byte Object，並在任務完成後 release it
+		data := bytePool.Get().([]byte)
+		defer bytePool.Put(data) // release it
+
+		// 模擬 I/O 操作 (寫入和讀取文件)
+		filename := fmt.Sprintf("/tmp/testfile_%d_%d", id, task)
+
+		...
+	}
+}
+</code></pre>
+<p><img src="images/7138/d17-04.jpg" alt="https://ithelp.ithome.com.tw/upload/images/20240916/20104930Wc3bkSZlgI.jpg" /></p>
+<p><img src="images/7138/d17-05.jpg" alt="https://ithelp.ithome.com.tw/upload/images/20240916/20104930aoksXXvlYr.jpg" /></p>
+<p><img src="images/7138/d17-06.jpg" alt="https://ithelp.ithome.com.tw/upload/images/20240916/20104930jnbuhjGZ00.jpg" /></p>
+<p>在這次改寫後，應用了 Object Pool 技術來優化記憶體分配和對象重複利用的方式，進一步提升了整體效能。讓我們逐步比較改寫前後的執行結果，尤其是在 Goroutine 的分佈、GC 的壓力、系統調用等方面的影響。</p>
+<ol>
+<li>Goroutine 的總執行時間和分佈<br />
+從改寫後的結果圖中可以看到，<code>main.worker</code> Goroutine 群組仍然是主要的執行實體，總共啟動了 1000 個 Goroutines。這些 Goroutines 主要負責執行任務（如 I/O 操作和 CPU 任務）。但相比於原來的結果，執行時間明顯縮短。在 Object Pool 技術的幫助下，main.worker 的總執行時間減少到了 157.834026ms，這與之前的總時間相比明顯下降。</li>
+</ol>
+<p>在改寫前，<code>main.worker</code> 占據了超過 1.6 秒的執行時間，這表明改用 Object Pool 後，記憶體分配的負擔得到了大幅緩解，從而提高了 Goroutines 的執行效率。Object Pool 避免了頻繁的記憶體分配和釋放操作，尤其在密集操作的場景下，顯著減少了 CPU 的上下文切換和記憶體管理的開銷。</p>
+<ol start="2">
+<li>GC 增量掃描和標記輔助的時間<br />
+在 GC 壓力方面，改寫後的結果圖表明大部分 Goroutine 的增量掃描時間保持在數ms範圍內，且 GC mark assist 所花費的時間也有了顯著的改善。對比改寫前的結果，標記輔助時間在高併發場景下有明顯的縮短，例如：</li>
+</ol>
+<p>Goroutine 46 在改寫後顯示的 GC 標記輔助時間大幅減少，僅僅約 86.912µs，而原來該數值在某些 Goroutine 中顯著偏高。這顯示 Object Pool 減少了 GC 對象標記和清理的負擔。<br />
+這些數據反映出，由於 Object Pool 的應用，GC 的整體運行效率得到了提升，系統的記憶體分配和釋放行為更為平衡，減少了 GC stop-the-world 的影響。雖然某些 Goroutines 的 GC 負擔依然存在，但這種負擔在改寫後已大幅減輕，讓整體的 GC 操作更加流暢和高效。</p>
+<ol start="3">
+<li>系統調用的阻塞和等待<br />
+在原始結果中，Syscall 和調度器等待時間對程序的性能影響較大，尤其是在密集 I/O 操作的場景下，出現了較為嚴重的系統調用阻塞現象。改寫後，系統調用的阻塞時間有所改善，因為 Object Pool 減少了記體體存分配的次數，從而減少了系統 I/O 操作的頻率。例如：</li>
+</ol>
+<p>改寫前的數據顯示，main.worker Goroutine 在 Syscall 上花費了不少時間，但在改用 Object Pool 後，Syscall 的阻塞時間大幅減少，這進一步提高了程式的並發處理能力。</p>
+<ol start="4">
+<li>CPU 調度的等待時間<br />
+改寫前，CPU 調度等待時間是另一個主要的瓶頸，因為大量的 Goroutines 創建導致 CPU 調度器的負載過大，從而導致了大量 Goroutines 處於等待狀態。Object pool 技術降低了 CPU 調度的壓力，減少了由於記憶體分配頻繁而導致的上下文切換次數。改寫後的結果顯示，調度器等待時間有了明顯縮短，這意味著 CPU 資源被更有效地利用，整體併發效率得到了提升。</li>
+</ol>
+<h2 id="小結"><a class="header" href="#小結">小結</a></h2>
+<p>今天的深入分析，讓我們將視野集中在 Go Trace 工具的應用上，並特別關注 Goroutine 分析。透過詳細的數據，我們可以直觀地看到每個 Goroutine 在程式中所消耗的執行時間、阻塞時間以及相關的內部系統事件。在這個過程中，我們發現，特定 Goroutine 群組的過度使用以及系統調度資源的競爭，成為了系統性能下降的主要原因。</p>
+<p>在分析過程中，我們也引入了 Object Pool 技術，來進一步減少記憶體分配頻率，從而緩解 GC 的壓力並減少上下文切換的開銷。這樣的優化讓程式在高併發場景下的性能得到了顯著提升。我們可以看到，Goroutines 的總執行時間得到了縮短，系統調用和阻塞現象也有了顯著改善。</p>
+<p>總結來說，透過使用 Go Trace，我們能夠精準地找出程式在高併發下的效能瓶頸，並透過記憶體優化策略，如 Object Pool，有效降低了系統負擔。我們的分析顯示，當程式中的 Goroutine 和 I/O 操作進行優化後，系統調度和 CPU 資源利用率都有顯著的改善。這樣的性能分析方法不僅幫助我們解決當前的效能問題，也為未來的系統優化提供了明確的方向。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="7138-16.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="7138-18.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="7138-16.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="7138-18.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Day 24 D24 簡介 Flame Graph - 應該是 Profilling 吧？</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">應該是 Profilling 吧？</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="d24-簡介-flame-graph"><a class="header" href="#d24-簡介-flame-graph">D24 簡介 Flame Graph</a></h1>
+<ul>
+<li>系列：應該是 Profilling 吧？系列 第 24 篇</li>
+<li>Day：24</li>
+<li>發佈時間：2024-09-24 00:03:40</li>
+<li>原文：<a href="https://ithelp.ithome.com.tw/articles/10356636">https://ithelp.ithome.com.tw/articles/10356636</a></li>
+</ul>
+<p>效能優化在軟體開發過程中扮演著至關重要的角色。然而，隨著系統的複雜度增加，定位效能瓶頸變得越來越困難。傳統的日誌和監控手段往往無法直觀地展示系統內部的運作。 **火焰圖（Flame Graph）**作為一種新穎的視覺化工具，為我們提供了全局視角，幫助快速識別效能熱點。透過本文的介紹，希望讀者能了解火焰圖的原理和應用方法，並將其運用於實際的效能分析和最佳化。</p>
+<p>我們之前在<a href="https://ithelp.ithome.com.tw/articles/10354730">D22 看見 GC</a>，曾經提到火焰圖（Flame grpah）。今天來簡短介紹它。</p>
+<h2 id="flame-graph"><a class="header" href="#flame-graph">Flame Graph</a></h2>
+<p>火焰圖是一種用於可視化層次結構資料的工具，最初是為了直觀展示軟體性能剖析（Profilling）過程中取樣的 Stack trace 資料。它可以快速、準確地識別最頻繁執行的程式碼路徑，也能說是應用程式中最耗費資源的部份。因為由底部開始往上延，又是紅色色調，很像火焰故而得名火焰圖。</p>
+<p><a href="https://github.com/brendangregg/FlameGraph">火焰圖</a>由 Bredan Gregg 開發的，它可以生成互動式的 SVG。</p>
+<p>火焰圖不僅適用於 CPU 效能剖析，還可以用於其他類型的數據，例如：</p>
+<ul>
+<li>記憶體使用情況（Memory）</li>
+<li>非 CPU 時間分析（Off-CPU）</li>
+<li>熱點和冷點分析（Hot/Cold）<br />
+差異分析（Differential）</li>
+</ul>
+<p>此外，火焰圖也可以用於任何層次結構的數據，例如檔案系統內容，並與樹狀圖（Treemaps）和旭日圖（Sunbursts）進行比較。<a href="https://www.brendangregg.com/blog/2017-02-06/flamegraphs-vs-treemaps-vs-sunburst.html">Flame Graphs vs Tree Maps vs Sunburst</a></p>
+<h2 id="火焰圖的結構與原理"><a class="header" href="#火焰圖的結構與原理">火焰圖的結構與原理</a></h2>
+<p><img src="images/7138/d24-01.svg" alt="" /></p>
+<ul>
+<li>
+<ul>
+<li>X 軸（橫軸）：表示 Stack 的樣本數量，通常依照字母順序排序（非時間順序）。這意味著 X 軸上的位置並不代表時間的流逝，而是為了展示所有不同的程式碼路徑。</li>
+</ul>
+</li>
+<li>Y 軸（縱軸）：表示 Stack 的深度，從底部的零開始計數。每向上一層，就表示 call stack 的更深一層。</li>
+<li>每個矩形框代表 Stack 裡的一個函數或方法呼叫（即一個 Stack Frame）。</li>
+<li>矩形框的寬度表示函數在 CPU 上執行，或者是它的上級函數在 CPU 執行的時間（基於採樣計數）。寬框的函數可能會比窄框的函數慢，也可能是因為只是很頻繁的被調用。這裡不會顯示調用計數（且是通過採樣的可能計數也不準）。</li>
+</ul>
+<p>矩形的頂部邊緣表示目前正在消耗 CPU 資源的函數。</p>
+<p>-矩形的下方表示其所呼叫的祖先函數，即呼叫路徑。</p>
+<ul>
+<li>色調，色調表示程式碼類型。例如紅色色調表示 user space 層級的程式碼，橙色色調表示 kernel space，黃色表示 C++ 的程式碼等等的。因為平常我們執行都是屬於user space 層級的程式碼路徑所以都是紅色色調。</li>
+<li>也透過顏色漸變來傳達訊息，例如記憶體使用量或 CPU 耗時。</li>
+</ul>
+<h3 id="反過來的火焰圖"><a class="header" href="#反過來的火焰圖">反過來的火焰圖</a></h3>
+<p>不難發現之前 pprof 的火焰圖，以及之後要介紹的 Pyrscope 的火焰圖方向正好是上下顛倒了。<br />
+這其實叫<code>Icicle graph</code>冰柱圖，不同於火焰圖從底部開始，冰柱圖是從頂部開始。</p>
+<p><img src="images/7138/d24-02.png" alt="" /></p>
+<p><img src="images/7138/d24-03.png" alt="" /></p>
+<h2 id="火焰圖的類型"><a class="header" href="#火焰圖的類型">火焰圖的類型</a></h2>
+<ul>
+<li><strong>CPU 火焰圖</strong><br />
+顯示哪些程式碼路徑正在消耗 CPU 資源，以及消耗了多少。<br />
+幫助識別效能瓶頸和優化機會。</li>
+<li><strong>記憶體火焰圖</strong><br />
+展示記憶體的分配情況，哪些函數在分配更多的記憶體。<br />
+有助於發現記憶體洩漏或優化記憶體使用。</li>
+</ul>
+<p><img src="images/7138/d24-04.svg" alt="" /></p>
+<ul>
+<li><strong>Off-CPU 火焰圖</strong><br />
+顯示程式在等待狀態（如 I/O、鎖、睡眠）下的堆疊情況。<br />
+幫助分析阻塞和等待問題。</li>
+</ul>
+<p><img src="images/7138/d24-05.svg" alt="" /></p>
+<ul>
+<li><strong>熱點/冷點火焰圖</strong><br />
+熱點圖：強調高頻率的程式碼路徑。<br />
+冷點圖：強調低頻率的程式碼路徑，可能隱藏著效率低的部分。</li>
+</ul>
+<p><img src="images/7138/d24-06.svg" alt="" /></p>
+<ul>
+<li><strong>差異火焰圖</strong><br />
+比較兩個火焰圖之間的差異，突出變化的部分。<br />
+用於在程式碼變更或配置調整前後，觀察效能的改進或退化。</li>
+</ul>
+<p><img src="images/7138/d24-07.svg" alt="" /></p>
+<h2 id="如何解讀火焰圖"><a class="header" href="#如何解讀火焰圖">如何解讀火焰圖</a></h2>
+<p>在解讀火焰圖時，首先要找到最寬的“塔”，也就是由多個堆疊框架堆積而成的區域。這些寬塔代表了消耗最多資源的程式碼路徑。由於空間限制，較窄的塔可能無法顯示函數名稱，但這也意味著它們對整體性能的影響較小。</p>
+<p>理解這些寬塔的呼叫關係，可以幫助我們了解程式效能的主要瓶頸所在，從而針對性地進行最佳化。</p>
+<p><img src="images/7138/d24-08.jpg" alt="https://ithelp.ithome.com.tw/upload/images/20240923/20104930NuVY7Lo53D.jpg" /></p>
+<h2 id="產生火焰圖的步驟"><a class="header" href="#產生火焰圖的步驟">產生火焰圖的步驟</a></h2>
+<ul>
+<li>收集效能資料：使用效能分析工具（如 perf、dtrace、eBPF 等）收集程式的堆疊追蹤資料。</li>
+<li>處理資料：使用 Brendan Gregg 提供的腳本（如 stackcollapse.pl）將收集到的堆疊資料折疊成適合產生火焰圖的格式。</li>
+<li>產生火焰圖：使用 flamegraph.pl 腳本產生火焰圖的 SVG 檔案。</li>
+<li>檢視與分析：在瀏覽器中開啟產生的 SVG 文件，利用互動功能（如滑鼠懸停顯示詳情、點擊縮放、搜尋功能）深入分析效能問題。</li>
+</ul>
+<h2 id="火焰圖的優勢"><a class="header" href="#火焰圖的優勢">火焰圖的優勢</a></h2>
+<ul>
+<li>直覺性：以圖形方式展示複雜的呼叫關係和資源消耗情況，易於理解。</li>
+<li>全面性：能夠涵蓋整個程式的效能數據，而不僅僅是某個模組或函數。</li>
+<li>可互動性：支援放大、縮小和搜索，方便深入分析。</li>
+<li>高效性：幫助開發者快速定位效能瓶頸，節省調試和優化時間。</li>
+</ul>
+<h2 id="小結"><a class="header" href="#小結">小結</a></h2>
+<p>火焰圖是一種強大的效能分析和視覺化工具，能夠幫助我們深入理解程式的執行情況和資源消耗。透過對火焰圖的解讀，我們可以快速定位效能瓶頸，發現潛在的問題，並指導最佳化工作。無論是在 CPU 效能調優、記憶體最佳化，或是分析阻塞和等待問題，火焰圖都提供了直覺而有效的手段。</p>
+<p><a href="https://www.brendangregg.com/flamegraphs.html">參考 Brendan 個人網站</a></p>
+<hr />
+<p>補充<br />
+A Must read , AI flame graphs by Brendan Greg,</p>
+<ol>
+<li>Y axis helps visually analyse the call stacks</li>
+<li>X-axis helps analyse cpu costs , compute costs,</li>
+</ol>
+<p><img src="images/7138/d24-09.jpg" alt="https://ithelp.ithome.com.tw/upload/images/20241107/20104930yG3eVfqjiQ.jpg" /></p>
+<p><a href="https://www.brendangregg.com/blog/2024-10-29/ai-flame-graphs.html">https://www.brendangregg.com/blog/2024-10-29/ai-flame-graphs.html</a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="7138-23.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="7138-25.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="7138-23.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="7138-25.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>
